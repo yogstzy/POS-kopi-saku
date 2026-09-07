@@ -1,0 +1,80 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+
+// Tabel Kategori (Coffee, Non-Coffee, Makanan)
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
+// Tabel Produk/Menu Kopi
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Int
+  categoryId  Int
+  imageUrl    String?  // TAMBAHAN: Kolom untuk menyimpan nama/link gambar (Bisa kosong/null)
+  stock       Int      @default(0) // <--- TAMBAHAN BARU
+  
+  category    Category @relation(fields: [categoryId], references: [id])
+  transactionItems TransactionItem[]
+}
+
+// Tabel Struk Transaksi
+model Transaction {
+  id             Int      @id @default(autoincrement())
+  totalAmount    Int
+  paymentMethod  String   // "CASH", "QRIS", dsb
+  createdAt      DateTime @default(now())
+  
+  items          TransactionItem[]
+}
+
+// Tabel Detail Item yang dibeli dalam satu struk
+model TransactionItem {
+  id             Int         @id @default(autoincrement())
+  transactionId  Int
+  productId      Int
+  qty            Int
+  subtotal       Int
+
+  transaction    Transaction @relation(fields: [transactionId], references: [id])
+  product        Product     @relation(fields: [productId], references: [id])
+}
+
+// Tabel Pengguna (Kasir / Admin)
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String   // Catatan: Untuk tahap belajar kita simpan teks biasa
+  name     String
+  role     String   @default("KASIR") // Bisa "KASIR" atau "ADMIN"
+}
+
+model Setting {
+  id                   Int     @id @default(1)
+  storeName            String  @default("Kopi Saku")
+  storeAddress         String  @default("")
+  storePhone           String  @default("")
+  receiptFooter        String  @default("Terima kasih sudah mampir!")
+  
+  taxEnabled           Boolean @default(false)
+  taxRate              Float   @default(11) // Default PPN 11%
+  
+  serviceChargeEnabled Boolean @default(false)
+  serviceChargeRate    Float   @default(5)  // Default Service 5%
+  
+  qrisImageUrl         String?
+  storeLogoUrl         String? 
+}

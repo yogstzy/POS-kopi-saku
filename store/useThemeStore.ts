@@ -1,0 +1,2 @@
+// store/useThemeStore.ts
+//kosong
