@@ -99,7 +99,7 @@ export default function LoginPage() {
         </form>
         
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-400">© 2026 Kopi Saku Point of Sale</p>
+          <p className="text-xs text-gray-400">© 2026 Kopi Saku. Developed By Yoga</p>
         </div>
       </div>
     </div>
